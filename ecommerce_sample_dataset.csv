@@ -1,0 +1,6 @@
+OrderID,Product,Category,Sales,Quantity,OrderDate,Region
+1001,Shirt,Apparel,29.99,1,2023-01-10,New York
+1002,Phone,Electronics,199.99,1,2023-01-11,Texas
+1003,Shoes,Footwear,89.5,2,2023-01-15,California
+1004,Laptop,Electronics,799.0,1,2023-01-20,Florida
+1005,Headphones,Electronics,49.99,1,2023-01-22,Texas
