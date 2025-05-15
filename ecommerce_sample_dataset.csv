@@ -1,6 +1,51 @@
 OrderID,Product,Category,Sales,Quantity,OrderDate,Region
 1001,Shirt,Apparel,29.99,1,2023-01-10,New York
 1002,Phone,Electronics,199.99,1,2023-01-11,Texas
-1003,Shoes,Footwear,89.5,2,2023-01-15,California
-1004,Laptop,Electronics,799.0,1,2023-01-20,Florida
+1003,Shoes,Footwear,89.50,2,2023-01-15,California
+1004,Laptop,Electronics,799.00,1,2023-01-20,Florida
 1005,Headphones,Electronics,49.99,1,2023-01-22,Texas
+1006,Jeans,Apparel,59.99,2,2023-01-25,New York
+1007,Sneakers,Footwear,120.00,1,2023-01-28,California
+1008,Tablet,Electronics,349.99,1,2023-02-02,Florida
+1009,Jacket,Apparel,89.99,1,2023-02-05,Texas
+1010,Boots,Footwear,150.00,1,2023-02-08,New York
+1011,Smartwatch,Electronics,249.99,1,2023-02-12,California
+1012,T-Shirt,Apparel,19.99,3,2023-02-15,Florida
+1013,Sandals,Footwear,45.00,2,2023-02-18,Texas
+1014,Monitor,Electronics,399.99,1,2023-02-22,New York
+1015,Hoodie,Apparel,74.99,1,2023-02-25,California
+1016,Running Shoes,Footwear,110.00,2,2023-03-01,Florida
+1017,Keyboard,Electronics,89.99,1,2023-03-05,Texas
+1018,Dress,Apparel,54.99,1,2023-03-08,New York
+1019,Loafers,Footwear,95.00,1,2023-03-12,California
+1020,Laptop,Electronics,849.00,1,2023-03-15,Florida
+1021,Polo Shirt,Apparel,39.99,2,2023-03-18,Texas
+1022,Heels,Footwear,85.00,1,2023-03-22,New York
+1023,Mouse,Electronics,35.99,2,2023-03-25,California
+1024,Blazer,Apparel,129.99,1,2023-03-28,Florida
+1025,Phone,Electronics,219.99,1,2023-04-02,Texas
+1026,Flats,Footwear,60.00,2,2023-04-05,New York
+1027,Shorts,Apparel,29.99,3,2023-04-08,California
+1028,Headphones,Electronics,59.99,1,2023-04-12,Florida
+1029,Ankle Boots,Footwear,135.00,1,2023-04-15,Texas
+1030,Sweater,Apparel,64.99,1,2023-04-18,New York
+1031,Tablet,Electronics,379.99,1,2023-04-22,California
+1032,Leggings,Apparel,34.99,2,2023-04-25,Florida
+1033,Sneakers,Footwear,130.00,1,2023-04-28,Texas
+1034,Smartwatch,Electronics,269.99,1,2023-05-02,New York
+1035,Shirt,Apparel,32.99,2,2023-05-05,California
+1036,Boots,Footwear,160.00,1,2023-05-08,Florida
+1037,Monitor,Electronics,429.99,1,2023-05-12,Texas
+1038,Jacket,Apparel,99.99,1,2023-05-15,New York
+1039,Running Shoes,Footwear,115.00,2,2023-05-18,California
+1040,Laptop,Electronics,999.00,1,2023-05-22,Florida
+1041,Jeans,Apparel,64.99,1,2023-05-25,Texas
+1042,Sandals,Footwear,50.00,3,2023-05-28,New York
+1043,Keyboard,Electronics,99.99,1,2023-06-02,California
+1044,Hoodie,Apparel,79.99,2,2023-06-05,Florida
+1045,Phone,Electronics,229.99,1,2023-06-08,Texas
+1046,Heels,Footwear,90.00,1,2023-06-12,New York
+1047,T-Shirt,Apparel,22.99,4,2023-06-15,California
+1048,Tablet,Electronics,399.99,1,2023-06-18,Florida
+1049,Loafers,Footwear,100.00,1,2023-06-22,Texas
+1050,Blazer,Apparel,139.99,1,2023-06-25,New York
