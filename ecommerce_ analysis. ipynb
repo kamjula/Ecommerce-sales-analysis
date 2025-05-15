@@ -1,25 +1,386 @@
- Step 1: Import libraries
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-# Step 2: Load the dataset
-df = pd.read_csv('ecommerce_sample_dataset.csv')
-
-# Step 3: Show basic info
-print(df.head())
-print(df.info())
-print(df.describe())
-df['OrderDate'] = pd.to_datetime(df['OrderDate'])
-# Check for missing values in each column
-print(df.isnull().sum())
-print("Total Sales: $", round(df['Sales'].sum(), 2))
-top_products = df.groupby('Product')['Sales'].sum().sort_values(ascending=False)
-print(top_products)
-sales_by_region = df.groupby('Region')['Sales'].sum().sort_values(ascending=False)
-print(sales_by_region)
-df.groupby('OrderDate')['Sales'].sum().plot(kind='line', figsize=(10,5), title='Sales Trend Over Time', color='green')
-plt.xlabel('Date')
-plt.ylabel('Sales')
-plt.grid(True)
-plt.show()
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# E-Commerce Sales Analysis\n",
+    "\n",
+    "**End-to-end analysis of e-commerce sales data using Python, Pandas, and Matplotlib.**\n",
+    "\n",
+    "---\n",
+    "\n",
+    "### Objectives\n",
+    "1. Load and profile the dataset\n",
+    "2. Clean and validate data quality\n",
+    "3. Analyze total revenue and key metrics\n",
+    "4. Rank top products by revenue\n",
+    "5. Break down sales by region\n",
+    "6. Analyze sales trends over time\n",
+    "7. Category-level performance\n",
+    "8. Quantity vs Revenue analysis\n",
+    "9. Key business insights\n",
+    "\n",
+    "**Dataset:** `ecommerce_sample_dataset.csv`  \n",
+    "**Columns:** OrderID, Product, Category, Sales, Quantity, OrderDate, Region"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": ["## Step 1: Import Libraries"]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import pandas as pd\n",
+    "import numpy as np\n",
+    "import matplotlib.pyplot as plt\n",
+    "import matplotlib.ticker as mticker\n",
+    "import seaborn as sns\n",
+    "import warnings\n",
+    "warnings.filterwarnings('ignore')\n",
+    "\n",
+    "# Plot styling\n",
+    "plt.rcParams['figure.figsize'] = (10, 5)\n",
+    "plt.rcParams['axes.spines.top'] = False\n",
+    "plt.rcParams['axes.spines.right'] = False\n",
+    "sns.set_palette('Set2')\n",
+    "\n",
+    "print('Libraries loaded successfully.')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": ["## Step 2: Load the Dataset"]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = pd.read_csv('ecommerce_sample_dataset.csv')\n",
+    "\n",
+    "print(f'Dataset shape: {df.shape[0]} rows x {df.shape[1]} columns')\n",
+    "print(f'Columns: {list(df.columns)}')\n",
+    "df.head(10)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": ["## Step 3: Data Quality Check"]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Data types\n",
+    "print('=== Data Types ===')\n",
+    "print(df.dtypes)\n",
+    "\n",
+    "# Missing values\n",
+    "print('\\n=== Missing Values ===')\n",
+    "missing = df.isnull().sum()\n",
+    "print(missing)\n",
+    "\n",
+    "# Duplicates\n",
+    "print(f'\\nDuplicate rows: {df.duplicated().sum()}')\n",
+    "\n",
+    "# Negative sales check\n",
+    "neg_sales = df[df['Sales'] < 0]\n",
+    "print(f'Negative Sales values: {len(neg_sales)}')\n",
+    "\n",
+    "# Convert OrderDate\n",
+    "df['OrderDate'] = pd.to_datetime(df['OrderDate'])\n",
+    "print(f'\\nDate range: {df[\"OrderDate\"].min()} to {df[\"OrderDate\"].max()}')\n",
+    "print('\\nData quality check passed!')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": ["## Step 4: Descriptive Statistics & Key Metrics"]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "print('=== KEY BUSINESS METRICS ===')\n",
+    "total_revenue   = df['Sales'].sum()\n",
+    "total_orders    = df['OrderID'].nunique()\n",
+    "total_quantity  = df['Quantity'].sum()\n",
+    "avg_order_value = df['Sales'].mean()\n",
+    "num_products    = df['Product'].nunique()\n",
+    "num_categories  = df['Category'].nunique()\n",
+    "num_regions     = df['Region'].nunique()\n",
+    "\n",
+    "print(f'Total Revenue      : ${total_revenue:,.2f}')\n",
+    "print(f'Total Orders       : {total_orders}')\n",
+    "print(f'Total Units Sold   : {total_quantity}')\n",
+    "print(f'Avg Order Value    : ${avg_order_value:,.2f}')\n",
+    "print(f'Unique Products    : {num_products}')\n",
+    "print(f'Categories         : {num_categories}')\n",
+    "print(f'Regions Covered    : {num_regions}')\n",
+    "\n",
+    "print('\\n=== SALES STATISTICS ===')\n",
+    "print(df[['Sales', 'Quantity']].describe().round(2))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": ["## Step 5: Top Products by Revenue"]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "top_products = (\n",
+    "    df.groupby('Product')\n",
+    "      .agg(Total_Revenue=('Sales','sum'), Orders=('OrderID','count'), Units=('Quantity','sum'))\n",
+    "      .sort_values('Total_Revenue', ascending=False)\n",
+    "      .reset_index()\n",
+    ")\n",
+    "top_products['Revenue_Share_%'] = (top_products['Total_Revenue'] / top_products['Total_Revenue'].sum() * 100).round(1)\n",
+    "\n",
+    "print('=== TOP PRODUCTS BY REVENUE ===')\n",
+    "print(top_products.to_string(index=False))\n",
+    "\n",
+    "# Bar chart\n",
+    "fig, ax = plt.subplots(figsize=(10, 5))\n",
+    "bars = ax.barh(top_products['Product'], top_products['Total_Revenue'], color=sns.color_palette('Set2', len(top_products)))\n",
+    "ax.set_xlabel('Total Revenue ($)')\n",
+    "ax.set_title('Top Products by Total Revenue', fontsize=14, fontweight='bold')\n",
+    "ax.xaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f'${x:,.0f}'))\n",
+    "for bar, val in zip(bars, top_products['Total_Revenue']):\n",
+    "    ax.text(bar.get_width() + 5, bar.get_y() + bar.get_height()/2, f'${val:,.0f}', va='center', fontsize=9)\n",
+    "plt.tight_layout()\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": ["## Step 6: Sales by Region"]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "region_summary = (\n",
+    "    df.groupby('Region')\n",
+    "      .agg(Total_Revenue=('Sales','sum'), Orders=('OrderID','count'), Avg_Order=('Sales','mean'))\n",
+    "      .sort_values('Total_Revenue', ascending=False)\n",
+    "      .reset_index()\n",
+    ")\n",
+    "region_summary['Revenue_Share_%'] = (region_summary['Total_Revenue'] / region_summary['Total_Revenue'].sum() * 100).round(1)\n",
+    "region_summary['Avg_Order'] = region_summary['Avg_Order'].round(2)\n",
+    "\n",
+    "print('=== SALES BY REGION ===')\n",
+    "print(region_summary.to_string(index=False))\n",
+    "\n",
+    "# Pie + bar side by side\n",
+    "fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13, 5))\n",
+    "\n",
+    "# Pie chart\n",
+    "ax1.pie(region_summary['Total_Revenue'], labels=region_summary['Region'],\n",
+    "        autopct='%1.1f%%', startangle=90, colors=sns.color_palette('Set2'))\n",
+    "ax1.set_title('Revenue Share by Region', fontsize=13, fontweight='bold')\n",
+    "\n",
+    "# Bar chart\n",
+    "ax2.bar(region_summary['Region'], region_summary['Total_Revenue'], color=sns.color_palette('Set2'))\n",
+    "ax2.set_xlabel('Region')\n",
+    "ax2.set_ylabel('Total Revenue ($)')\n",
+    "ax2.set_title('Total Revenue by Region', fontsize=13, fontweight='bold')\n",
+    "ax2.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f'${x:,.0f}'))\n",
+    "\n",
+    "plt.tight_layout()\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": ["## Step 7: Sales Trend Over Time"]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "daily_sales = df.groupby('OrderDate')['Sales'].sum().reset_index().sort_values('OrderDate')\n",
+    "\n",
+    "# Add 7-day rolling average\n",
+    "daily_sales['Rolling_7d'] = daily_sales['Sales'].rolling(window=7, min_periods=1).mean()\n",
+    "\n",
+    "fig, ax = plt.subplots(figsize=(12, 5))\n",
+    "ax.plot(daily_sales['OrderDate'], daily_sales['Sales'], color='#4C72B0', alpha=0.4, linewidth=1, label='Daily Sales')\n",
+    "ax.plot(daily_sales['OrderDate'], daily_sales['Rolling_7d'], color='#DD8452', linewidth=2.5, label='7-Day Rolling Avg')\n",
+    "ax.set_xlabel('Date')\n",
+    "ax.set_ylabel('Sales ($)')\n",
+    "ax.set_title('Daily Sales Trend with 7-Day Rolling Average', fontsize=14, fontweight='bold')\n",
+    "ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f'${x:,.0f}'))\n",
+    "ax.legend()\n",
+    "plt.tight_layout()\n",
+    "plt.show()\n",
+    "\n",
+    "print(f'Peak single-day revenue: ${daily_sales[\"Sales\"].max():,.2f} on {daily_sales.loc[daily_sales[\"Sales\"].idxmax(), \"OrderDate\"].date()}')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": ["## Step 8: Category-Level Performance"]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cat_summary = (\n",
+    "    df.groupby('Category')\n",
+    "      .agg(\n",
+    "          Total_Revenue=('Sales','sum'),\n",
+    "          Orders=('OrderID','count'),\n",
+    "          Units_Sold=('Quantity','sum'),\n",
+    "          Avg_Sale=('Sales','mean'),\n",
+    "          Max_Sale=('Sales','max')\n",
+    "      )\n",
+    "      .sort_values('Total_Revenue', ascending=False)\n",
+    "      .reset_index()\n",
+    ")\n",
+    "cat_summary['Avg_Sale'] = cat_summary['Avg_Sale'].round(2)\n",
+    "cat_summary['Revenue_%'] = (cat_summary['Total_Revenue'] / cat_summary['Total_Revenue'].sum() * 100).round(1)\n",
+    "\n",
+    "print('=== CATEGORY PERFORMANCE ===')\n",
+    "print(cat_summary.to_string(index=False))\n",
+    "\n",
+    "fig, axes = plt.subplots(1, 2, figsize=(13, 5))\n",
+    "\n",
+    "# Revenue by category\n",
+    "axes[0].bar(cat_summary['Category'], cat_summary['Total_Revenue'], color=sns.color_palette('Set2'))\n",
+    "axes[0].set_title('Revenue by Category', fontsize=13, fontweight='bold')\n",
+    "axes[0].set_ylabel('Total Revenue ($)')\n",
+    "axes[0].yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f'${x:,.0f}'))\n",
+    "\n",
+    "# Units sold by category\n",
+    "axes[1].bar(cat_summary['Category'], cat_summary['Units_Sold'], color=sns.color_palette('husl', len(cat_summary)))\n",
+    "axes[1].set_title('Units Sold by Category', fontsize=13, fontweight='bold')\n",
+    "axes[1].set_ylabel('Total Units')\n",
+    "\n",
+    "plt.tight_layout()\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": ["## Step 9: Quantity vs Revenue — Scatter Analysis"]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "product_agg = (\n",
+    "    df.groupby(['Product', 'Category'])\n",
+    "      .agg(Total_Revenue=('Sales','sum'), Total_Quantity=('Quantity','sum'))\n",
+    "      .reset_index()\n",
+    ")\n",
+    "\n",
+    "fig, ax = plt.subplots(figsize=(10, 6))\n",
+    "categories = product_agg['Category'].unique()\n",
+    "palette = sns.color_palette('Set2', len(categories))\n",
+    "for cat, color in zip(categories, palette):\n",
+    "    subset = product_agg[product_agg['Category'] == cat]\n",
+    "    ax.scatter(subset['Total_Quantity'], subset['Total_Revenue'], label=cat, s=120, color=color)\n",
+    "    for _, row in subset.iterrows():\n",
+    "        ax.annotate(row['Product'], (row['Total_Quantity'], row['Total_Revenue']),\n",
+    "                    textcoords='offset points', xytext=(5, 5), fontsize=8)\n",
+    "\n",
+    "ax.set_xlabel('Total Quantity Sold')\n",
+    "ax.set_ylabel('Total Revenue ($)')\n",
+    "ax.set_title('Revenue vs Quantity by Product', fontsize=14, fontweight='bold')\n",
+    "ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f'${x:,.0f}'))\n",
+    "ax.legend(title='Category')\n",
+    "plt.tight_layout()\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": ["## Step 10: Key Insights & Business Recommendations"]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Auto-generate insights from data\n",
+    "top_product   = top_products.iloc[0]\n",
+    "top_region    = region_summary.iloc[0]\n",
+    "top_category  = cat_summary.iloc[0]\n",
+    "low_category  = cat_summary.iloc[-1]\n",
+    "\n",
+    "print('=' * 55)\n",
+    "print('          KEY INSIGHTS & RECOMMENDATIONS')\n",
+    "print('=' * 55)\n",
+    "\n",
+    "print(f'''\n",
+    "REVENUE OVERVIEW\n",
+    "  Total Revenue   : ${df[\"Sales\"].sum():,.2f}\n",
+    "  Total Orders    : {df[\"OrderID\"].nunique()}\n",
+    "  Avg Order Value : ${df[\"Sales\"].mean():,.2f}\n",
+    "\n",
+    "TOP PERFORMER\n",
+    "  Best Product  : {top_product[\"Product\"]} (${top_product[\"Total_Revenue\"]:,.2f}, {top_product[\"Revenue_Share_%\"]}% of revenue)\n",
+    "  Best Region   : {top_region[\"Region\"]} (${top_region[\"Total_Revenue\"]:,.2f}, {top_region[\"Revenue_Share_%\"]}% share)\n",
+    "  Best Category : {top_category[\"Category\"]} (${top_category[\"Total_Revenue\"]:,.2f})\n",
+    "\n",
+    "OPPORTUNITIES\n",
+    "  Lowest Category : {low_category[\"Category\"]} — potential for targeted promotions\n",
+    "  Focus Region    : Lowest revenue region needs demand gen or pricing review\n",
+    "\n",
+    "RECOMMENDATIONS\n",
+    "  1. Double down on {top_category[\"Category\"]} — highest revenue, expand SKUs\n",
+    "  2. Investigate {low_category[\"Category\"]} underperformance — pricing or demand?\n",
+    "  3. Prioritize {top_region[\"Region\"]} for inventory placement (top market)\n",
+    "  4. Cross-sell high-quantity/low-revenue products with high-margin items\n",
+    "  5. Use rolling 7-day trend to detect seasonal spikes for inventory planning\n",
+    "''')"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "name": "python",
+   "version": "3.10.0"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
