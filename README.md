@@ -1,4 +1,4 @@
-# 🛒 E-Commerce Sales Analysis
+# 🛒 E-Commerce Sales Analysis — Python EDA & Business Insights
 
 An end-to-end sales analytics project on a multi-category e-commerce dataset — covering data cleaning, EDA, revenue trends, regional breakdowns, and business recommendations using Python.
 
